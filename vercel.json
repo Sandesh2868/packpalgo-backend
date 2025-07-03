@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "builds": [
-    { "src": "api/estimate-budget.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/estimate-budget", "dest": "api/estimate-budget.js" }
-  ]
-}

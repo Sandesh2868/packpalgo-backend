@@ -6,9 +6,15 @@ const PORT = process.env.PORT || 3000;
 
 // 🔓 CORS configuration
 app.use(cors({
-  origin: ["https://enchanting-gumdrop-6882e1.netlify.app", "http://localhost:3000"],
+  origin: [
+    "https://enchanting-gumdrop-6882e1.netlify.app", 
+    "http://localhost:3000",
+    "http://localhost:5173",  // Vite dev server
+    "http://localhost:4173"   // Vite preview
+  ],
   methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type'],
+  credentials: true
 }));
 
 // 📝 Parse JSON bodies

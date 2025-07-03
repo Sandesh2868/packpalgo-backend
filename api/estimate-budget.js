@@ -9,9 +9,27 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // ✅ Only allow POST requests
+  if (req.method !== "POST") {
+    return res.status(405).json({ 
+      error: "Method not allowed", 
+      message: "This endpoint only accepts POST requests",
+      expectedMethod: "POST"
+    });
+  }
+
   // 🚀 Your existing code here
   try {
     const { destination, travelStyle, travelMode, people, days } = req.body;
+
+    // ✅ Validate required fields
+    if (!destination || !travelStyle || !travelMode || !people || !days) {
+      return res.status(400).json({ 
+        error: "Missing required fields",
+        required: ["destination", "travelStyle", "travelMode", "people", "days"],
+        received: req.body
+      });
+    }
 
     // your AI logic / dummy response
     const budget = {
@@ -23,6 +41,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ budget });
   } catch (error) {
-    return res.status(500).json({ error: "Something went wrong" });
+    console.error("API Error:", error);
+    return res.status(500).json({ error: "Something went wrong", details: error.message });
   }
 }

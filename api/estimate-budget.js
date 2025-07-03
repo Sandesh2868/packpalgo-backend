@@ -1,29 +1,28 @@
-// api/estimate-budget.js
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST requests are allowed" });
+  // 🔓 CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "https://enchanting-gumdrop-6882e1.netlify.app");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // ✅ Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
-  const { destination, travelStyle, travelMode, people, days } = req.body;
+  // 🚀 Your existing code here
+  try {
+    const { destination, travelStyle, travelMode, people, days } = req.body;
 
-  const safePeople = Number(people) || 1;
-  const safeDays = Number(days) || 1;
+    // your AI logic / dummy response
+    const budget = {
+      Travel: 1000 * people,
+      Stay: 800 * days,
+      Food: 500 * days * people,
+      Misc: 300,
+    };
 
-  const base = {
-    Budget: { Travel: 1500, Stay: 800, Food: 500, Misc: 300 },
-    "Mid-range": { Travel: 2500, Stay: 1500, Food: 800, Misc: 500 },
-    Luxury: { Travel: 4500, Stay: 3000, Food: 1500, Misc: 800 },
-  };
-
-  const styleRates = base[travelStyle] || base["Mid-range"];
-
-  const budget = {
-    Travel: Math.round(styleRates.Travel * safePeople),
-    Stay: Math.round(styleRates.Stay * safeDays * safePeople),
-    Food: Math.round(styleRates.Food * safeDays * safePeople),
-    Misc: Math.round(styleRates.Misc * safePeople),
-  };
-
-  return res.status(200).json({ budget });
+    return res.status(200).json({ budget });
+  } catch (error) {
+    return res.status(500).json({ error: "Something went wrong" });
+  }
 }

@@ -6,15 +6,37 @@ const PORT = process.env.PORT || 3000;
 
 // 🔓 CORS configuration
 app.use(cors({
-  origin: [
-    "https://enchanting-gumdrop-6882e1.netlify.app", 
-    "http://localhost:3000",
-    "http://localhost:5173",  // Vite dev server
-    "http://localhost:4173"   // Vite preview
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      "https://enchanting-gumdrop-6882e1.netlify.app",
+      "http://localhost:3000",
+      "http://localhost:5173",  // Vite dev server
+      "http://localhost:4173"   // Vite preview
+    ];
+    
+    // Check if the origin is in our allowed list or is a netlify.app domain
+    if (allowedOrigins.includes(origin) || origin.includes('.netlify.app')) {
+      return callback(null, true);
+    }
+    
+    console.log('CORS blocked origin:', origin);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
   ],
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
 
 // 📝 Parse JSON bodies
@@ -32,10 +54,15 @@ app.get('/', (req, res) => {
 // 💰 Budget estimation endpoint
 app.post('/api/estimate-budget', (req, res) => {
   try {
+    console.log('Request received from origin:', req.headers.origin);
+    console.log('Request headers:', req.headers);
+    console.log('Request body:', req.body);
+    
     const { destination, travelStyle, travelMode, people, days } = req.body;
 
     // ✅ Validate required fields
     if (!destination || !travelStyle || !travelMode || !people || !days) {
+      console.log('Validation failed - missing fields');
       return res.status(400).json({ 
         error: "Missing required fields",
         required: ["destination", "travelStyle", "travelMode", "people", "days"],
